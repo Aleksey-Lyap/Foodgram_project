@@ -36,12 +36,12 @@ class DownloadCartView(APIView):
             shoping_list.append(f'{item} - {buying_list[item]["amount"]} '
                             f'{buying_list[item]["measurement_unit"]}')
         shoping_list.append(' ')
-        shoping_list.append('FoodGram, 2022')
-        pdfmetrics.registerFont(TTFont('DejaVuSerif',
-                                       './api/ttf/DejaVuSerif.ttf'))
+        shoping_list.append('FoodGram, 2023')
+        pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold',
+                                       './api/ttf/DejaVuSerif-Bold.ttf'))
         buffer = io.BytesIO()
         p = canvas.Canvas(buffer)
-        p.setFont("DejaVuSerif", 15)
+        p.setFont("DejaVuSerif-Bold", 15)
         start = 800
         for line in shoping_list:
             p.drawString(50, start, line)
@@ -50,4 +50,4 @@ class DownloadCartView(APIView):
         p.save()
         buffer.seek(0)
         return FileResponse(buffer, as_attachment=True,
-                            filename='cart_list.pdf'
+                            filename='cart_list.pdf')

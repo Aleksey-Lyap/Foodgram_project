@@ -8,7 +8,7 @@ from rest_framework.response import Response
 
 from api.download_cart import DownloadCartView
 from api.filters import IngredientSearchFilter, RecipeFilters
-from api.models import Cart, Favorite, Ingredient, Recipe, Subscribe, Tag
+from api.models import Cart, Favorite, Ingredient, Recipe, Subscribe, Tag, IngredientRecipe
 from api.serializers import (
     CartSerializer,
     FavoriteSerializer,
@@ -19,7 +19,7 @@ from api.serializers import (
     SubscriptionSerializer,
     TagSerializer
 )
-from user.models import User
+from users.models import User
 
 
 class CreateUserView(UserViewSet):

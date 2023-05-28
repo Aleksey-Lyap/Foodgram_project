@@ -2,7 +2,7 @@ from colorfield.fields import ColorField
 from django.core.validators import MinValueValidator
 from django.db import models
 
-from user.models import User
+from users.models import User
 
 
 class Ingredient(models.Model):
@@ -67,7 +67,8 @@ class Recipe(models.Model):
     image = models.ImageField(
         verbose_name='Изображение',
         upload_to='recipes/image/',
-        help_text='Выберите изображение рецепта'
+        help_text='Выберите изображение рецепта',
+        null=False,
     )
     text = models.TextField(
         verbose_name='Описание рецепта',

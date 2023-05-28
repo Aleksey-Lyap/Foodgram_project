@@ -12,7 +12,7 @@ from api.models import (
     Tag,
     TagRecipe
 )
-from user.models import User
+from users.models import User
 
 
 class CommonSubscribed(metaclass=serializers.SerializerMetaclass):
@@ -126,14 +126,14 @@ class FavoriteSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
     cooking_time = serializers.IntegerField()
-    image = Base64ImageField(max_length=None, use_url=False,)
+    image = Base64ImageField(max_length=None, use_url=False, required=False, allow_null=True)
 
 
 class CartSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
     cooking_time = serializers.IntegerField()
-    image = Base64ImageField(max_length=None, use_url=False,)
+    image = Base64ImageField(max_length=None, use_url=False, required=False, allow_null=True)
 
 
 class RecipeSerializer(serializers.ModelSerializer,
@@ -166,7 +166,7 @@ class RecipeSerializerPost(serializers.ModelSerializer,
         many=True)
     ingredients = IngredientAmountRecipeSerializer(
         source='ingredientrecipes', many=True)
-    image = Base64ImageField(max_length=None, use_url=False,)
+    image = Base64ImageField(max_length=None, use_url=False, required=False, allow_null=True)
 
     class Meta:
         model = Recipe
