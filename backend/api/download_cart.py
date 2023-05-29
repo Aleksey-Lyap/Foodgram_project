@@ -34,7 +34,7 @@ class DownloadCartView(APIView):
         shoping_list.append('Список покупок:')
         for item in buying_list:
             shoping_list.append(f'{item} - {buying_list[item]["amount"]} '
-                            f'{buying_list[item]["measurement_unit"]}')
+                                f'{buying_list[item]["measurement_unit"]}')
         shoping_list.append(' ')
         shoping_list.append('FoodGram, 2023')
         pdfmetrics.registerFont(TTFont('DejaVuSerif-Bold',

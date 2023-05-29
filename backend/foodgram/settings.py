@@ -7,7 +7,7 @@ SECRET_KEY = 'django-insecure-6x8)g2g_jwpv@&s^xil6_xf&s=amo64)4!z-1^6lydnn2+=1rf
 
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', '172.30.224.1', 'localhost', 'backend',]
+ALLOWED_HOSTS = ['127.0.0.1', '172.30.224.1', 'localhost', 'backend', ]
 
 INTERNAL_IPS = ['127.0.0.1', 'localhost', 'backend']
 
@@ -98,9 +98,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
     ),
-    
+
     'DEFAULT_PAGINATION_CLASS': 'api.pagination.CustomPagination',
-    
+
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',),

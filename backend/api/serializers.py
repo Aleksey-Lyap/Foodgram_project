@@ -2,16 +2,8 @@ from djoser.serializers import UserCreateSerializer
 from drf_extra_fields.fields import Base64ImageField
 from rest_framework import serializers
 
-from api.models import (
-    Cart,
-    Favorite,
-    Ingredient,
-    IngredientRecipe,
-    Recipe,
-    Subscribe,
-    Tag,
-    TagRecipe
-)
+from api.models import (Cart, Favorite, Ingredient, IngredientRecipe, Recipe,
+                        Subscribe, Tag, TagRecipe)
 from users.models import User
 
 
@@ -126,14 +118,14 @@ class FavoriteSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
     cooking_time = serializers.IntegerField()
-    image = Base64ImageField(max_length=None, use_url=False, required=False, allow_null=True)
+    image = Base64ImageField(max_length=None, use_url=False)
 
 
 class CartSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     name = serializers.CharField()
     cooking_time = serializers.IntegerField()
-    image = Base64ImageField(max_length=None, use_url=False, required=False, allow_null=True)
+    image = Base64ImageField(max_length=None, use_url=False)
 
 
 class RecipeSerializer(serializers.ModelSerializer,
@@ -166,7 +158,7 @@ class RecipeSerializerPost(serializers.ModelSerializer,
         many=True)
     ingredients = IngredientAmountRecipeSerializer(
         source='ingredientrecipes', many=True)
-    image = Base64ImageField(max_length=None, use_url=False, required=False, allow_null=True)
+    image = Base64ImageField(max_length=None, use_url=False)
 
     class Meta:
         model = Recipe
@@ -228,8 +220,8 @@ class RecipeSerializerPost(serializers.ModelSerializer,
             text=text,
             cooking_time=cooking_time,
         )
-        recipe = self.add_tags_and_ingredients(tags_data, ingredients, recipe)
-        return recipe
+
+        return self.add_tags_and_ingredients(tags_data, ingredients, recipe)
 
     def update(self, instance, validated_data):
         tags_data = validated_data.pop('tags')

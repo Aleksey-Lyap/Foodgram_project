@@ -8,17 +8,11 @@ from rest_framework.response import Response
 
 from api.download_cart import DownloadCartView
 from api.filters import IngredientSearchFilter, RecipeFilters
-from api.models import Cart, Favorite, Ingredient, Recipe, Subscribe, Tag, IngredientRecipe
-from api.serializers import (
-    CartSerializer,
-    FavoriteSerializer,
-    IngredientSerializer,
-    RecipeSerializer,
-    RecipeSerializerPost,
-    RegistrationSerializer,
-    SubscriptionSerializer,
-    TagSerializer
-)
+from api.models import Cart, Favorite, Ingredient, Recipe, Subscribe, Tag
+from api.serializers import (CartSerializer, FavoriteSerializer,
+                             IngredientSerializer, RecipeSerializer,
+                             RecipeSerializerPost, RegistrationSerializer,
+                             SubscriptionSerializer, TagSerializer)
 from users.models import User
 
 
