@@ -9,10 +9,10 @@ router =  DefaultRouter()
 
 
 
-router.register('', RecipeViewSet, basename='recipes')
+router.register('recipes', RecipeViewSet, basename='recipes')
+urlpatterns = router.urls 
 
-urlpatterns = [
+urlpatterns += [
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
-    path('', include(router.urls)),
 ]

@@ -4,13 +4,34 @@ from rest_framework import permissions, viewsets
 from rest_framework.response import Response
 
 from recipes.models import Recipe
-from recipes.serializers import RecipeSerializer
-
+from recipes.serializers import DetailRecipeSerializer, ListRecipeSerializer
+from recipes.mixins import GetSerializerClassMixin
 
 User = get_user_model()
 
 
-class RecipeViewSet(viewsets.ModelViewSet):
+class RecipeViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
 
-    queryset = Recipe.objects.all()
-    serializer_class = RecipeSerializer
+   queryset = Recipe.objects.all()
+   serializer_class = ListRecipeSerializer
+    #permission_classes_by_action = {
+       #'list': [permissions.AllowAny],
+       #'retrieve': [permissions.AllowAny],
+       #'create': [permissions.IsAuthenticated],
+    #}
+
+
+   serializer_class_by_action = {
+        'list': ListRecipeSerializer,
+        'retrieve': DetailRecipeSerializer,
+        'create': ListRecipeSerializer,
+    }
+
+  # def get_serializer(self, *args, **kwargs):
+    #  if self.action == 'list':
+    #     return ListRecipeSerializer()
+    #  return super().get_serializer(*args, **kwargs)
+   
+       
+
+

@@ -9,10 +9,6 @@ class Ingredients(models.Model):
         unique = True,
         max_length=200,
         verbose_name='Название')
-    quantity = models.DecimalField(
-        max_digits=3,
-        decimal_places=1,
-        verbose_name='Количество')
     measurement_unit = models.CharField(
         max_length=50,
         verbose_name='Единицы измерения')
@@ -51,7 +47,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User,
         models.SET_NULL,
-        blank=True,
+       # blank=True,
         null=True,
         related_name='recipes',
         verbose_name='Автор')
@@ -99,6 +95,10 @@ class IngredientsRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name='recipes_ingredients',
         verbose_name='Рецепт')
+    quantity = models.DecimalField(
+        max_digits=3,
+        decimal_places=1,
+        verbose_name='Количество')
 
     def __str__(self):
         return f'{self.ingredients} {self.recipe}'
