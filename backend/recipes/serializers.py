@@ -13,6 +13,19 @@ class TagSerializer(serializers.PrimaryKeyRelatedField,serializers.ModelSerializ
         model = Tag
         fields = ('name', 'color')
 
+class TagRecipeSerializer(serializers.PrimaryKeyRelatedField,serializers.ModelSerializer):
+    class Meta:
+        model = TagRecipe
+        fields = ('tag', 'recipe')
+
+
+class IngredientsRecipeSerializer(serializers.PrimaryKeyRelatedField,serializers.ModelSerializer):
+    id = serializers.PrimaryKeyRelatedField(queryset=Ingredients.objects.all(), write_only=True )
+    quantity =  serializers.IntegerField()
+    class Meta:
+        model = IngredientsRecipe
+        fields = ('id', 'quantity')
+
 
 
 class DetailRecipeSerializer(serializers.ModelSerializer):
@@ -22,32 +35,31 @@ class DetailRecipeSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField()
     author = serializers.SerializerMethodField()
     
-
     class Meta:
         model = Recipe
         fields =('id', 'tags', 'author', 'ingredients',
-            
-                 'name', 'image', 'text', 'is_favorited', 'is_in_shopping_cart', 'cooking_time')
+                 'name', 'image', 'text', 'is_favorited',
+                 'is_in_shopping_cart', 'cooking_time')
         
     def get_author(self, obj):
-        return { "email": obj.author.email,
-                 "id": obj.author.id,
-                 "username": obj.author.username,
-                 "first_name": obj.author.first_name,
-                 "last_name": obj.author.last_name,
-                 "is_subscribed": Follow.objects.filter(user_id = self.context['request'].user.id, author_id = obj.author.id).exists()
-        }
+        if obj.author is not None:
+            return { "email": obj.author.email,
+                     "id": obj.author.id,
+                     "username": obj.author.username,
+                     "first_name": obj.author.first_name,
+                     "last_name": obj.author.last_name,
+                     "is_subscribed":Follow.objects.filter(user_id = self.context['request'].user.id, author_id = obj.author.id).exists()
+            }
+        return None
 
     def get_is_favorited(self, obj):
         return Favorite.objects.filter(recipe_id=obj.id).exists()
-    
+
     def get_is_in_shopping_cart(self, obj):
         return Cart.objects.filter(recipe_id=obj.id).exists()
 
-        
     def get_ingredients(self, obj):
         ingredients_recipe = IngredientsRecipe.objects.filter(recipe_id=obj.id)
-        
         return [
            {    "id": ingredient_recipe.ingredients.id,
                 "name": ingredient_recipe.ingredients.name,
@@ -64,8 +76,40 @@ class DetailRecipeSerializer(serializers.ModelSerializer):
         ]
 
 
-class ListRecipeSerializer(serializers.ModelSerializer):
-    results = DetailRecipeSerializer(many=True )
+class ListRecipeSerializer(DetailRecipeSerializer):
+    
     class Meta:
         model = Recipe
-        fields = ('results',)
+        fields =('id', 'tags', 'author', 'ingredients',
+                 'name', 'image', 'text', 'is_favorited',
+                 'is_in_shopping_cart', 'cooking_time')
+       
+
+class CreateUpdateRecipeSerializer(serializers.ModelSerializer):
+   # author = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
+    ingredients = IngredientsRecipeSerializer(many = True)
+    tags = TagRecipeSerializer(queryset = TagRecipe.objects.all(), many = True)
+
+    class Meta:
+        model = Recipe
+        fields = ('ingredients', 'quantity', 'tags', 'image', 'name', 'text', 'cooking_time')
+
+    def create(self, validated_data):
+        ingredients_data = validated_data.pop('ingredients')
+        tags_data = validated_data.pop('tags')
+        recipe = Recipe.objects.create(**validated_data)
+        for tag in tags_data:
+            TagRecipe.objects.create(recipe=recipe, tag=tag)
+        self.create_ingredients(
+            ingredients_data=ingredients_data, recipe=recipe)
+        return recipe
+    
+    def update(self, instance, validated_data):
+        instance.ingredients = validated_data.get("ingredients", instance.ingredients)
+        instance.tags = validated_data.get("tags", instance.tags)
+        instance.image = validated_data.get("image", instance.image)
+        instance.name = validated_data.get("name", instance.name)
+        instance.text = validated_data.get("text", instance.text)
+        instance.cooking_time = validated_data.get("cooking_time", instance.cooking_time)
+        instance.save()
+        return instance

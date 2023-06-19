@@ -47,7 +47,7 @@ class Recipe(models.Model):
     author = models.ForeignKey(
         User,
         models.SET_NULL,
-       # blank=True,
+        blank=True,
         null=True,
         related_name='recipes',
         verbose_name='Автор')
