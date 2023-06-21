@@ -21,10 +21,11 @@ class RecipeViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
        #'retrieve': [permissions.AllowAny],
        #'create': [permissions.IsAuthenticated],
     #}
+    
+   serializer_class = DetailRecipeSerializer
 
 
    serializer_class_by_action = {
-        'list': ListRecipeSerializer,
         'retrieve': DetailRecipeSerializer,
         'create': CreateUpdateRecipeSerializer,
         'update': CreateUpdateRecipeSerializer

@@ -6,26 +6,42 @@ from users.models import User, Follow
 class IngredientsSerializer(serializers.PrimaryKeyRelatedField, serializers.ModelSerializer):
     class Meta:
         model = Ingredients
-        fields = ('name', 'measurement_unit')
+        fields = ('id', 'name', 'measurement_unit')
 
 class TagSerializer(serializers.PrimaryKeyRelatedField,serializers.ModelSerializer):
     class Meta:
         model = Tag
-        fields = ('name', 'color')
+        fields = ('id', 'name', 'color')
 
 class TagRecipeSerializer(serializers.PrimaryKeyRelatedField,serializers.ModelSerializer):
+    tag = TagSerializer(queryset=Tag.objects.all())
     class Meta:
         model = TagRecipe
         fields = ('tag', 'recipe')
 
 
-class IngredientsRecipeSerializer(serializers.PrimaryKeyRelatedField,serializers.ModelSerializer):
-    id = serializers.PrimaryKeyRelatedField(queryset=Ingredients.objects.all(), write_only=True )
+""" class IngredientsRecipeSerializer(serializers.PrimaryKeyRelatedField,serializers.ModelSerializer):
+    id = serializers.SerializerMethodField()
     quantity =  serializers.IntegerField()
     class Meta:
         model = IngredientsRecipe
         fields = ('id', 'quantity')
 
+    def get_id(self, obj):
+        ingredients_recipe = IngredientsRecipe.objects.filter(recipe_id=obj.id)
+        return [
+           {    "id": ingredient_recipe.ingredients.id,
+                "amount": ingredient_recipe.quantity
+            }
+            for ingredient_recipe in ingredients_recipe
+        ]
+ """
+
+class IngredientsRecipeSerializer(serializers.PrimaryKeyRelatedField,serializers.ModelSerializer):
+    ingredients = IngredientsSerializer(queryset=Ingredients.objects.all())
+    class Meta:
+        model = IngredientsRecipe
+        fields = ('ingredients', 'recipe', 'quantity')
 
 
 class DetailRecipeSerializer(serializers.ModelSerializer):
@@ -86,24 +102,27 @@ class ListRecipeSerializer(DetailRecipeSerializer):
        
 
 class CreateUpdateRecipeSerializer(serializers.ModelSerializer):
-   # author = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
-    ingredients = IngredientsRecipeSerializer(many = True)
-    tags = TagRecipeSerializer(queryset = TagRecipe.objects.all(), many = True)
+    author = serializers.HiddenField(default=serializers.CurrentUserDefault())
+    ingredients = IngredientsRecipeSerializer(many = True, queryset = Ingredients.objects.all())
+    tags = TagRecipeSerializer(queryset = Tag.objects.all(), many = True)
+    
 
     class Meta:
         model = Recipe
-        fields = ('ingredients', 'quantity', 'tags', 'image', 'name', 'text', 'cooking_time')
+        fields = ('author', 'ingredients', 'tags', 'image', 'name', 'text', 'cooking_time')
+
+
 
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
         recipe = Recipe.objects.create(**validated_data)
         for tag in tags_data:
-            TagRecipe.objects.create(recipe=recipe, tag=tag)
-        self.create_ingredients(
-            ingredients_data=ingredients_data, recipe=recipe)
+            TagRecipe.objects.create(recipe_id=recipe.id, tag=tag)
+        
         return recipe
     
+
     def update(self, instance, validated_data):
         instance.ingredients = validated_data.get("ingredients", instance.ingredients)
         instance.tags = validated_data.get("tags", instance.tags)
