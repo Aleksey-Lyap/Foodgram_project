@@ -16,6 +16,7 @@ class Ingredients(models.Model):
     class Meta:
         verbose_name = 'Ингредиент'
         verbose_name_plural = 'Ингредиенты'
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -46,9 +47,7 @@ class Recipe(models.Model):
 
     author = models.ForeignKey(
         User,
-        models.SET_NULL,
-        blank=True,
-        null=True,
+        on_delete=models.CASCADE,
         related_name='recipes',
         verbose_name='Автор')
     name = models.CharField(
@@ -62,6 +61,7 @@ class Recipe(models.Model):
     ingredients = models.ManyToManyField(
         Ingredients,
         through='IngredientsRecipe',
+        through_fields=("recipe", "ingredients"),
         related_name='recipes',
         verbose_name='Продукты в рецепте')
     tags = models.ManyToManyField(
@@ -71,6 +71,7 @@ class Recipe(models.Model):
     cooking_time = models.IntegerField(
         verbose_name='Время приготовления')
     create_date = models.DateTimeField(
+        db_index=True,
         auto_now_add=True,
         verbose_name='Дата создания')
 
@@ -95,8 +96,8 @@ class IngredientsRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name='recipes_ingredients',
         verbose_name='Рецепт')
-    quantity = models.DecimalField(
-        max_digits=3,
+    amount = models.DecimalField(
+        max_digits=5,
         decimal_places=1,
         verbose_name='Количество')
 

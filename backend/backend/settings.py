@@ -27,6 +27,10 @@ INSTALLED_APPS = [
     'recipes',
     'users',
 
+    'rest_framework.authtoken',
+
+    'django_filters',
+
 ]
 
 MIDDLEWARE = [
@@ -70,28 +74,30 @@ DATABASES = {
 }
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+    ),
 
     'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
     ],
 
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-         'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ],
+    
+
+    # 'DEFAULT_AUTHENTICATION_CLASSES': [
+    #      'rest_framework_simplejwt.authentication.JWTAuthentication',
+    # ],
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'PAGE_SIZE': 6,
 }
-
-
-SIMPLE_JWT = {
-    # Устанавливаем срок жизни токена
-   'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
-   'AUTH_HEADER_TYPES': ('Bearer',),
-}
-
 
 DJOSER = {
-    
+    'LOGIN_FIELD': 'email',
+    'HIDE_USERS': False,
     'SERIALIZERS': {
-        'user_registration': 'users.serializers.CustomUserSerializer',
+        'user': 'users.serializers.CustomUserSerializer',
+        'current_user': 'users.serializers.CustomUserSerializer',
+        'user_create': 'users.serializers.CustomUserCreateSerializer',
     },
 }
 

@@ -1,12 +1,12 @@
-
-
 from rest_framework.routers import  DefaultRouter
-from recipes.views import RecipeViewSet
-from users.views import CustomUserViewSet
+from recipes.views import RecipeViewSet, TagsViewSet, IngredientsViewSet
 
-router =  DefaultRouter() 
+router =  DefaultRouter()
 
-router.register(r'recipes', RecipeViewSet, basename='recipes')
-router.register(r'users', CustomUserViewSet, basename='users')
+app_name = 'recipes'
+
+router.register('recipes', RecipeViewSet, basename='recipes')
+router.register('tags', TagsViewSet, basename='tags')
+router.register('ingredients', IngredientsViewSet, basename='ingredients')
 
 urlpatterns = router.urls 

@@ -26,8 +26,6 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
-    
-    REQUIRED_FIELDS = ['email', 'first_name', 'last_name']
 
 
 class Follow(models.Model): 
