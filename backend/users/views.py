@@ -1,13 +1,14 @@
-
 from django.shortcuts import get_object_or_404
-from rest_framework.response import Response 
-from users.serializers import CustomUserSerializer, CustomUserCreateSerializer, PasswordSerializer, SubscriptionSerializer
-from users.models import Follow, User
 from recipes.mixins import GetSerializerClassMixin
-from rest_framework import viewsets, status, mixins, permissions, filters
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.decorators import action
 from recipes.pagination import RecipesAPIListPagination
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+from users.models import Follow, User
+from users.serializers import (CustomUserCreateSerializer,
+                               CustomUserSerializer, PasswordSerializer,
+                               SubscriptionSerializer)
 
 
 class CustomUserViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
@@ -19,7 +20,7 @@ class CustomUserViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
     }
     permission_classes = (AllowAny,)
     pagination_class = RecipesAPIListPagination
- 
+
     @action(detail=False, permission_classes=[IsAuthenticated])
     def me(self, *args, **kwargs):
         user = get_object_or_404(User, id=self.request.user.id)
@@ -51,7 +52,7 @@ class CustomUserViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
             Follow.objects.create(user=user, author=author)
             serializer = CustomUserSerializer(author, context=context)
             return Response(serializer.data, status.HTTP_201_CREATED)
-        
+
         get_object_or_404(Follow, author=author, user=user).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

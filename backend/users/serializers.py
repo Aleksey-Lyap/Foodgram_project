@@ -1,8 +1,8 @@
-from users.models import Follow, User
-from rest_framework import serializers
-from djoser.serializers import UserSerializer, UserCreateSerializer
 from django.contrib.auth.password_validation import validate_password
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from recipes.serializers import RecipeSubFavorCartSerializer
+from rest_framework import serializers
+from users.models import User
 
 
 class CustomUserSerializer(UserSerializer):
@@ -14,8 +14,7 @@ class CustomUserSerializer(UserSerializer):
 
     def get_is_subscribed(self, obj):
         print(obj)
-        return obj.following.filter(user_id = self.context['request'].user.id).exists()
-
+        return obj.following.filter(user_id=self.context['request'].user.id).exists()
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):

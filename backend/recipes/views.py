@@ -1,27 +1,24 @@
 from django.contrib.auth import get_user_model
+from django.db.models import Sum
+from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
-
-from rest_framework import permissions, viewsets, status
+from django_filters.rest_framework import DjangoFilterBackend
+from recipes.filter import RecipeFilter
+from recipes.mixins import GetSerializerClassMixin
+from recipes.models import (Cart, Favorite, Ingredients, IngredientsRecipe,
+                            Recipe, Tag)
+from recipes.pagination import RecipesAPIListPagination
+from recipes.serializers import (CreateUpdateRecipeSerializer,
+                                 IngredientsSerializer, RecipeSerializer,
+                                 RecipeSubFavorCartSerializer, TagSerializer)
+from rest_framework import status, viewsets
+from rest_framework.decorators import action
+from rest_framework.permissions import (AllowAny, IsAuthenticated,
+                                        IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
 
-from recipes.models import Recipe, Tag, Ingredients, Favorite, Cart, IngredientsRecipe
-from recipes.serializers import RecipeSerializer, CreateUpdateRecipeSerializer, TagSerializer, IngredientsSerializer, RecipeSubFavorCartSerializer
-
-from recipes.mixins import GetSerializerClassMixin
-from rest_framework.permissions import IsAuthenticatedOrReadOnly
-
-from django.db.models import Sum
-
-from recipes.pagination import RecipesAPIListPagination
-
-from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.decorators import action
-from recipes.filter import RecipeFilter
-from django_filters.rest_framework import DjangoFilterBackend
-from fpdf import FPDF
-
-from django.http import HttpResponse
 User = get_user_model()
+
 
 class RecipeViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
 
@@ -34,9 +31,9 @@ class RecipeViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
     }
     serializer_class = CreateUpdateRecipeSerializer
     serializer_class_by_action = {
-         'list': RecipeSerializer,
-         'retrieve': RecipeSerializer
-     }
+        'list': RecipeSerializer,
+        'retrieve': RecipeSerializer
+    }
 
     pagination_class = RecipesAPIListPagination
     filterset_class = RecipeFilter
@@ -52,10 +49,9 @@ class RecipeViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
             Favorite.objects.create(user=user, recipe=recipe)
             serializer = RecipeSubFavorCartSerializer(recipe, context=context)
             return Response(serializer.data, status.HTTP_201_CREATED)
-        
+
         get_object_or_404(Favorite, user=user, recipe=recipe).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
@@ -67,10 +63,9 @@ class RecipeViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
             Cart.objects.create(user=user, recipe=recipe)
             serializer = RecipeSubFavorCartSerializer(recipe, context=context)
             return Response(serializer.data, status.HTTP_201_CREATED)
-        
+
         get_object_or_404(Favorite, user=user, recipe=recipe).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
 
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
@@ -85,7 +80,9 @@ class RecipeViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
 
         shop_list = 'Список покупок\n\n'
         for ingredient in ingredients:
-            shop_list += f'{ingredient["ingredients__name"]} {ingredient["ingredients__measurement_unit"]} {ingredient["sum_amount"]}\n'
+            shop_list += f'{ingredient["ingredients__name"]}\
+                           {ingredient["sum_amount"]}\
+                           {ingredient["ingredients__measurement_unit"]}\n'
 
         response = HttpResponse(content=shop_list,
                                 content_type='text/plain')
@@ -93,8 +90,8 @@ class RecipeViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
                                            'filename="shopping_list.txt"')
 
         return response
-    
-    
+
+
 class TagsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
     serializer_class = TagSerializer

@@ -1,9 +1,10 @@
 import base64
-from rest_framework import serializers
-from recipes.models import Ingredients, Tag, Recipe, IngredientsRecipe, TagRecipe, Favorite, Cart
-from users.models import User, Follow
 
 from django.core.files.base import ContentFile
+from recipes.models import (Cart, Favorite, Ingredients, IngredientsRecipe,
+                            Recipe, Tag, TagRecipe)
+from rest_framework import serializers
+from users.models import Follow
 
 
 class IngredientsSerializer(serializers.ModelSerializer):
@@ -33,6 +34,7 @@ class IngredientsRecipeCreateSerializer(serializers.ModelSerializer):
         write_only=True
     )
     amount = serializers.IntegerField()
+
     class Meta:
         model = IngredientsRecipe
         fields = ('id', 'amount')
@@ -61,22 +63,24 @@ class RecipeSerializer(serializers.ModelSerializer):
     is_in_shopping_cart = serializers.SerializerMethodField()
     author = serializers.SerializerMethodField()
     image = Base64ImageField()
-    
+
     class Meta:
         model = Recipe
-        fields =('id', 'tags', 'author', 'ingredients',
-                 'name', 'image', 'text', 'is_favorited',
-                 'is_in_shopping_cart', 'cooking_time')
-        
+        fields = ('id', 'tags', 'author', 'ingredients',
+                  'name', 'image', 'text', 'is_favorited',
+                  'is_in_shopping_cart', 'cooking_time')
+
     def get_author(self, obj):
         if obj.author is not None:
-            return { "email": obj.author.email,
-                     "id": obj.author.id,
-                     "username": obj.author.username,
-                     "first_name": obj.author.first_name,
-                     "last_name": obj.author.last_name,
-                     "is_subscribed":Follow.objects.filter(user_id = self.context['request'].user.id, author_id = obj.author.id).exists()
-            }
+            return {"email": obj.author.email,
+                    "id": obj.author.id,
+                    "username": obj.author.username,
+                    "first_name": obj.author.first_name,
+                    "last_name": obj.author.last_name,
+                    "is_subscribed": Follow.objects.filter(
+                        user_id=self.context['request'].user.id,
+                        author_id=obj.author.id
+                    ).exists()}
         return None
 
     def get_is_favorited(self, obj):
@@ -88,18 +92,20 @@ class RecipeSerializer(serializers.ModelSerializer):
     def get_ingredients(self, obj):
         ingredients_recipe = IngredientsRecipe.objects.filter(recipe_id=obj.id)
         return [
-           {    "id": ingredient_recipe.ingredients.id,
-                "name": ingredient_recipe.ingredients.name,
-                "amount": ingredient_recipe.amount,
-                "measurement_unit": ingredient_recipe.ingredients.measurement_unit,
-            }
+            {"id": ingredient_recipe.ingredients.id,
+             "name": ingredient_recipe.ingredients.name,
+             "amount": ingredient_recipe.amount,
+             "measurement_unit": ingredient_recipe.ingredients.measurement_unit}
             for ingredient_recipe in ingredients_recipe
         ]
 
     def get_tags(self, obj):
         tags_recipe = TagRecipe.objects.filter(recipe_id=obj.id)
         return [
-           {"id": tag_recipe.tag.id, "name": tag_recipe.tag.name, "color": tag_recipe.tag.color} for tag_recipe in tags_recipe
+            {"id": tag_recipe.tag.id,
+             "name": tag_recipe.tag.name,
+             "color": tag_recipe.tag.color}
+            for tag_recipe in tags_recipe
         ]
 
 
@@ -137,7 +143,10 @@ class CreateUpdateRecipeSerializer(RecipeSerializer):
         if ingredients_data:
             IngredientsRecipe.objects.filter(recipe=recipe).delete()
             for ingredient in ingredients_data:
-                IngredientsRecipe.objects.create(recipe=recipe, ingredients=ingredient['ingredients'], amount=ingredient['amount'])
+                IngredientsRecipe.objects.create(
+                    recipe=recipe,
+                    ingredients=ingredient['ingredients'],
+                    amount=ingredient['amount'])
         return recipe
 
 

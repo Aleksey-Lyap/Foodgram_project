@@ -1,12 +1,12 @@
-from django.db import models
 from colorfield.fields import ColorField
+from django.db import models
 from users.models import User
 
 
 class Ingredients(models.Model):
 
     name = models.CharField(
-        unique = True,
+        unique=True,
         max_length=200,
         verbose_name='Название')
     measurement_unit = models.CharField(
@@ -117,9 +117,9 @@ class TagRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name='recipes_tag',
         verbose_name='Рецепт')
-    
+
     def __str__(self):
-        return f'{self.tag} {self.recipe}' 
+        return f'{self.tag} {self.recipe}'
 
 
 class Favorite(models.Model):
