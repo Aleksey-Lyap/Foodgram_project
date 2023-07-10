@@ -10,11 +10,14 @@ class CustomUserSerializer(UserSerializer):
 
     class Meta:
         model = User
-        fields = ('email', 'id', 'username', 'first_name', 'last_name', 'is_subscribed')
+        fields = ('email', 'id', 'username', 'first_name',
+                  'last_name', 'is_subscribed')
 
     def get_is_subscribed(self, obj):
         print(obj)
-        return obj.following.filter(user_id=self.context['request'].user.id).exists()
+        return obj.following.filter(
+            user_id=self.context['request'].user.id
+        ).exists()
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):

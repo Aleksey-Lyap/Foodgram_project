@@ -32,7 +32,10 @@ class CustomUserViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
     def set_password(self, *args, **kwargs):
         user = self.request.user
         context = {'user': user}
-        serializer = PasswordSerializer(data=self.request.data, context=context)
+        serializer = PasswordSerializer(
+            data=self.request.data,
+            context=context
+        )
         if serializer.is_valid(raise_exception=True):
             user.set_password(serializer.validated_data['new_password'])
             user.save()

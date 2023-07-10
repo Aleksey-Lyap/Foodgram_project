@@ -95,7 +95,8 @@ class RecipeSerializer(serializers.ModelSerializer):
             {"id": ingredient_recipe.ingredients.id,
              "name": ingredient_recipe.ingredients.name,
              "amount": ingredient_recipe.amount,
-             "measurement_unit": ingredient_recipe.ingredients.measurement_unit}
+             "measurement_unit":
+             ingredient_recipe.ingredients.measurement_unit}
             for ingredient_recipe in ingredients_recipe
         ]
 
@@ -116,7 +117,8 @@ class CreateUpdateRecipeSerializer(RecipeSerializer):
 
     class Meta:
         model = Recipe
-        fields = ('author', 'ingredients', 'tags', 'image', 'name', 'text', 'cooking_time')
+        fields = ('author', 'ingredients', 'tags',
+                  'image', 'name', 'text', 'cooking_time')
 
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients')

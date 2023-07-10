@@ -6,8 +6,10 @@ from recipes.models import Ingredients
 
 class Command(BaseCommand):
     def handle(self, *args, **options) -> str:
-        with open('D:/Dev/foodgram-project-react/backend/data/ingredients0.json',
-                  'r', encoding='utf-8') as f:
+        with open(
+            'D:/Dev/foodgram-project-react/backend/data/ingredients0.json',
+            'r', encoding='utf-8'
+        ) as f:
             data = json.load(f)
             for ingredient in data:
                 Ingredients.objects.create(
