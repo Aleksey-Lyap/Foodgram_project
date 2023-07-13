@@ -3,19 +3,20 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from recipes.filter import RecipeFilter
-from recipes.mixins import GetSerializerClassMixin
-from recipes.models import (Cart, Favorite, Ingredients, IngredientsRecipe,
-                            Recipe, Tag)
-from recipes.pagination import RecipesAPIListPagination
-from recipes.serializers import (CreateUpdateRecipeSerializer,
-                                 IngredientsSerializer, RecipeSerializer,
-                                 RecipeSubFavorCartSerializer, TagSerializer)
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import (AllowAny, IsAuthenticated,
                                         IsAuthenticatedOrReadOnly)
 from rest_framework.response import Response
+
+from recipes.filter import RecipeFilter
+from recipes.mixins import GetSerializerClassMixin
+from recipes.models import (Cart, Favorite, Ingredient, IngredientsRecipe,
+                            Recipe, Tag)
+from recipes.pagination import RecipesAPIListPagination
+from recipes.serializers import (CreateUpdateRecipeSerializer,
+                                 IngredientsSerializer, RecipeSerializer,
+                                 RecipeSubFavorCartSerializer, TagSerializer)
 
 User = get_user_model()
 
@@ -39,33 +40,27 @@ class RecipeViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
     filterset_class = RecipeFilter
     filter_backends = (DjangoFilterBackend,)
 
-    @action(detail=True, methods=['post', 'delete'],
-            permission_classes=[IsAuthenticated])
-    def favorite(self, request, context={}, *args, **kwargs):
+    def get_filter(self, model, request, context={}, *args, **kwargs):
         context['request'] = self.request
         recipe = get_object_or_404(Recipe, id=kwargs['pk'])
         user = request.user
         if request.method == 'POST':
-            Favorite.objects.create(user=user, recipe=recipe)
+            model.objects.create(user=user, recipe=recipe)
             serializer = RecipeSubFavorCartSerializer(recipe, context=context)
             return Response(serializer.data, status.HTTP_201_CREATED)
 
-        get_object_or_404(Favorite, user=user, recipe=recipe).delete()
+        get_object_or_404(model, user=user, recipe=recipe).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    @action(detail=True, methods=['post', 'delete'],
+            permission_classes=[IsAuthenticated])
+    def favorite(self, request, context={}, *args, **kwargs):
+        return self.get_filter(Favorite, request, context, **kwargs)
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])
     def shopping_cart(self, request, context={}, *args, **kwargs):
-        context['request'] = self.request
-        recipe = get_object_or_404(Recipe, id=kwargs['pk'])
-        user = request.user
-        if request.method == 'POST':
-            Cart.objects.create(user=user, recipe=recipe)
-            serializer = RecipeSubFavorCartSerializer(recipe, context=context)
-            return Response(serializer.data, status.HTTP_201_CREATED)
-
-        get_object_or_404(Favorite, user=user, recipe=recipe).delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        return self.get_filter(Cart, request, context, **kwargs)
 
     @action(detail=False, methods=['get'],
             permission_classes=[IsAuthenticated])
@@ -91,6 +86,12 @@ class RecipeViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
 
         return response
 
+    def perform_create(self, serializer):
+        serializer.save(author=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(author=self.request.user)
+
 
 class TagsViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Tag.objects.all()
@@ -98,7 +99,7 @@ class TagsViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class IngredientsViewSet(viewsets.ModelViewSet):
-    queryset = Ingredients.objects.all()
+    queryset = Ingredient.objects.all()
     serializer_class = IngredientsSerializer
 
     def get_queryset(self):

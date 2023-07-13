@@ -1,7 +1,8 @@
 from django.contrib.auth.password_validation import validate_password
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from recipes.serializers import RecipeSubFavorCartSerializer
 from rest_framework import serializers
+
+from recipes.serializers import RecipeSubFavorCartSerializer
 from users.models import User
 
 
@@ -14,7 +15,6 @@ class CustomUserSerializer(UserSerializer):
                   'last_name', 'is_subscribed')
 
     def get_is_subscribed(self, obj):
-        print(obj)
         return obj.following.filter(
             user_id=self.context['request'].user.id
         ).exists()
@@ -37,7 +37,6 @@ class PasswordSerializer(serializers.Serializer):
         return value
 
     def validate_new_password(self, value):
-        print(value)
         validate_password(value)
         return value
 
@@ -60,7 +59,6 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         recipes = obj.recipes.all()
         limit = request.GET.get('recipes_limit')
-        print('gdbnt', {limit})
         if limit:
             recipes = recipes[:int(limit)]
         serializer = RecipeSubFavorCartSerializer(

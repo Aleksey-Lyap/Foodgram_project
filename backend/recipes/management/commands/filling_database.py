@@ -1,7 +1,8 @@
 import json
 
 from django.core.management.base import BaseCommand
-from recipes.models import Ingredients
+
+from recipes.models import Ingredient
 
 
 class Command(BaseCommand):
@@ -12,7 +13,7 @@ class Command(BaseCommand):
         ) as f:
             data = json.load(f)
             for ingredient in data:
-                Ingredients.objects.create(
+                Ingredient.objects.create(
                     name=ingredient['fields']['name'],
                     measurement_unit=ingredient['fields']['measurement_unit']
                 )

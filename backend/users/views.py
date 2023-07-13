@@ -1,10 +1,11 @@
 from django.shortcuts import get_object_or_404
-from recipes.mixins import GetSerializerClassMixin
-from recipes.pagination import RecipesAPIListPagination
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+
+from recipes.mixins import GetSerializerClassMixin
+from recipes.pagination import RecipesAPIListPagination
 from users.models import Follow, User
 from users.serializers import (CustomUserCreateSerializer,
                                CustomUserSerializer, PasswordSerializer,
@@ -23,8 +24,7 @@ class CustomUserViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
 
     @action(detail=False, permission_classes=[IsAuthenticated])
     def me(self, *args, **kwargs):
-        user = get_object_or_404(User, id=self.request.user.id)
-        serializer = self.get_serializer(user)
+        serializer = self.get_serializer(self.request.user)
         return Response(serializer.data)
 
     @action(detail=False, methods=['post'],
@@ -36,14 +36,10 @@ class CustomUserViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
             data=self.request.data,
             context=context
         )
-        if serializer.is_valid(raise_exception=True):
-            user.set_password(serializer.validated_data['new_password'])
-            user.save()
-            return Response({'status': 'password set'})
-        else:
-            return Response(
-                serializer.errors, status=status.HTTP_400_BAD_REQUEST
-            )
+        serializer.is_valid(raise_exception=True)
+        user.set_password(serializer.validated_data['new_password'])
+        user.save()
+        return Response({'status': 'password set'})
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=[IsAuthenticated])

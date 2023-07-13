@@ -1,9 +1,10 @@
 from colorfield.fields import ColorField
 from django.db import models
+
 from users.models import User
 
 
-class Ingredients(models.Model):
+class Ingredient(models.Model):
 
     name = models.CharField(
         unique=True,
@@ -59,7 +60,7 @@ class Recipe(models.Model):
     text = models.TextField(
         verbose_name='Описание рецепта')
     ingredients = models.ManyToManyField(
-        Ingredients,
+        Ingredient,
         through='IngredientsRecipe',
         through_fields=("recipe", "ingredients"),
         related_name='recipes',
@@ -68,7 +69,7 @@ class Recipe(models.Model):
         Tag,
         through='TagRecipe',
         verbose_name='Тег рецепта')
-    cooking_time = models.IntegerField(
+    cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления')
     create_date = models.DateTimeField(
         db_index=True,
@@ -87,7 +88,7 @@ class Recipe(models.Model):
 class IngredientsRecipe(models.Model):
 
     ingredients = models.ForeignKey(
-        Ingredients,
+        Ingredient,
         on_delete=models.CASCADE,
         related_name='ingredients_recipes',
         verbose_name='Ингридиенты')
@@ -100,6 +101,12 @@ class IngredientsRecipe(models.Model):
         max_digits=5,
         decimal_places=1,
         verbose_name='Количество')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['recipe', 'ingredients'],
+                                    name='unique_ingredient_recipe')
+        ]
 
     def __str__(self):
         return f'{self.ingredients} {self.recipe}'
@@ -117,6 +124,12 @@ class TagRecipe(models.Model):
         on_delete=models.CASCADE,
         related_name='recipes_tag',
         verbose_name='Рецепт')
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(fields=['recipe', 'tag'],
+                                    name='unique_tag_recipe')
+        ]
 
     def __str__(self):
         return f'{self.tag} {self.recipe}'
