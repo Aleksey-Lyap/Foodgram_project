@@ -101,7 +101,6 @@ class CreateUpdateRecipeSerializer(RecipeSerializer):
                   'image', 'name', 'text', 'cooking_time')
 
     def validate(self, obj):
-        print(obj.get('ingredients'))
         inrgedients_list = [
             item['ingredients'] for item in obj.get('ingredients')
         ]
