@@ -1,8 +1,7 @@
 from django.contrib.auth.password_validation import validate_password
 from djoser.serializers import UserCreateSerializer, UserSerializer
-from rest_framework import serializers
-
 from recipes.serializers import RecipeSubFavorCartSerializer
+from rest_framework import serializers
 from users.models import User
 
 

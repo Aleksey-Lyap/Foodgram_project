@@ -1,11 +1,10 @@
 from django.shortcuts import get_object_or_404
+from recipes.mixins import GetSerializerClassMixin
+from recipes.pagination import RecipesAPIListPagination
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-
-from recipes.mixins import GetSerializerClassMixin
-from recipes.pagination import RecipesAPIListPagination
 from users.models import Follow, User
 from users.serializers import (CustomUserCreateSerializer,
                                CustomUserSerializer, PasswordSerializer,
