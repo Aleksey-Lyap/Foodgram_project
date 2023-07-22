@@ -24,6 +24,11 @@ class Ingredient(models.Model):
 
 class Tag(models.Model):
 
+    COLOR_PALETTE = [
+        ("#FFFFFF", "white", ),
+        ("#000000", "black", ),
+    ]
+
     name = models.CharField(
         max_length=200,
         verbose_name='Название',
@@ -32,6 +37,7 @@ class Tag(models.Model):
         verbose_name='Цвет',
         default='#FF0000',
         format="hexa",
+        samples=COLOR_PALETTE,
         unique=True)
     slug = models.SlugField(
         unique=True,

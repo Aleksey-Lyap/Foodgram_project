@@ -10,7 +10,7 @@ SECRET_KEY = (
 
 DEBUG = False
 
-ALLOWED_HOSTS = ['130.193.39.227', '127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['130.193.39.227', '127.0.0.1', 'localhost', 'foodgramm.myvnc.com']
 
 INSTALLED_APPS = [
     'django.contrib.admin',

@@ -74,9 +74,9 @@ class RecipeViewSet(GetSerializerClassMixin, viewsets.ModelViewSet):
 
         shop_list = 'Список покупок\n\n'
         for ingredient in ingredients:
-            shop_list += f'{ingredient["ingredients__name"]}\
-                           {ingredient["sum_amount"]}\
-                           {ingredient["ingredients__measurement_unit"]}\n'
+            shop_list += (f'{ingredient["ingredients__name"]} '
+                          f'{ingredient["sum_amount"]} '
+                          f'{ingredient["ingredients__measurement_unit"]}\n')
 
         response = HttpResponse(content=shop_list,
                                 content_type='text/plain')
