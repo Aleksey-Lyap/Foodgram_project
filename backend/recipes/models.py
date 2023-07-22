@@ -30,6 +30,7 @@ class Tag(models.Model):
         unique=True)
     color = ColorField(
         verbose_name='Цвет',
+        default='#FF0000',
         unique=True)
     slug = models.SlugField(
         unique=True,
