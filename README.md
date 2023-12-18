@@ -18,11 +18,10 @@
 
 ### Доступ
 
-Проект запущен на сервере и доступен по адресам:
-- http://foodgramm.myvnc.com/recipes
-- http://130.193.39.227/recipes
-- Админ-зона: http://foodgramm.myvnc.com/admin/
-- API: http://foodgramm.myvnc.com/api/
+Запущенный проект будет доступен по адресам:
+- http://"Ваш IP-адрес"/recipes
+- Админ-зона: http://"Ваш IP-адрес"/admin/
+- API: http://"Ваш IP-адрес"/api/
 
 ### Зависимости
 - Перечислены в файле backend/requirements.txt
